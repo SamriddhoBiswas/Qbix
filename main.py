@@ -7,20 +7,32 @@ import pickle
 
 
 def classify_hue(h, s, v):
-    if h >= 5 and h <= 36 and s >= 9 and s <= 60 and v >= 45 and v <= 179:
+    # White: low saturation, high brightness
+    if s < 40 and v > 180:
         return "W"
-    elif h >= 0 and h <= 25 and s >= 156 and s <= 232 and v >= 82 and v <= 143:
-        return "R"
-    elif h >= 28 and h <= 39 and s >= 146 and s <= 255 and v >= 132 and v <= 194:
+
+    # Yellow
+    if 20 <= h <= 35:
         return "Y"
-    elif h >= 42 and h <= 160 and s >= 133 and s <= 255 and v >= 97 and v <= 190:
-        return "G"
-    elif h >= 55 and h <= 121 and s >= 129 and s <= 255 and v >= 26 and v <= 84:
+
+    # Blue
+    if 90 <= h <= 130:
         return "B"
-    elif h >= 1 and h <= 85 and s >= 211 and s <= 248 and v >= 75 and v <= 148:
+
+    # Red (wraps HSV range)
+    if h <= 10 or h >= 170:
+        return "R"
+
+    # Green
+    if 40 <= h <= 85:
+        return "G"
+
+    # Orange
+    if 10 < h < 20:
         return "O"
-    else:
-        return "O"
+
+    return "?"   # NEVER default to a color
+
 
 def get_position_for_move(move, frame_size, image_size):
     frame_h, frame_w = frame_size
