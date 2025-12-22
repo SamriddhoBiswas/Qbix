@@ -215,7 +215,7 @@ if len(cube_faces) == 6:
             except Exception as e:
                 print("⚠️ Failed to send cube state to viewer:", e)
 
-        cap = cv2.VideoCapture(1)
+        cap = cv2.VideoCapture("http://192.168.0.106:8080/video")
 
         current_overlay_step = 0
         logical_step = 0
