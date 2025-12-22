@@ -13,7 +13,7 @@ cv2.createTrackbar("UH", "Trackbars", 179, 179, nothing)
 cv2.createTrackbar("US", "Trackbars", 255, 255, nothing)
 cv2.createTrackbar("UV", "Trackbars", 255, 255, nothing)
 
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture("http://192.168.0.106:8080/video")
 
 while True:
     ret, frame = cap.read()
