@@ -60,25 +60,38 @@ HOST = 'localhost'
 PORT = 9999
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 s.bind((HOST, PORT))
 s.listen(1)
-print("🔄 Viewer waiting for cube state updates...")
+s.setblocking(False)
+print("🔄 Viewer listening on localhost:9999 — waiting for sender...")
 
-conn, _ = s.accept()
-print("✅ Viewer connected to sender.")
-conn.setblocking(False)
-
+conn = None
 cube = None
 
 while True:
     frame = np.zeros((640, 870, 3), dtype=np.uint8)
 
-    try:
-        data = conn.recv(4096)
-        if data:
-            cube = pickle.loads(data)
-    except BlockingIOError:
-        pass
+    # Accept a new connection if we don't have one yet (non-blocking)
+    if conn is None:
+        try:
+            conn, _ = s.accept()
+            conn.setblocking(False)
+            print("✅ Viewer connected to sender.")
+        except BlockingIOError:
+            pass
+
+    # If connected, try to receive data (non-blocking)
+    if conn is not None:
+        try:
+            data = conn.recv(4096)
+            if data:
+                try:
+                    cube = pickle.loads(data)
+                except Exception as e:
+                    print("Failed to unpickle data:", e)
+        except (BlockingIOError, ConnectionResetError):
+            pass
 
     if cube:
         cube_str = cube_to_string(cube)
@@ -89,10 +102,17 @@ while True:
                 img = color_map[color]
                 frame = overlay_image_alpha(frame, img, faces[face][i])
                 idx += 1
+    else:
+        cv2.putText(frame, "Waiting for cube state...", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (200, 200, 200), 2)
 
     cv2.imshow("Rubik's Cube State Viewer", frame)
-    if cv2.waitKey(1) == 27:
+    if cv2.waitKey(100) == 27:
         break
 
-conn.close()
+if conn is not None:
+    try:
+        conn.close()
+    except Exception:
+        pass
+s.close()
 cv2.destroyAllWindows()
