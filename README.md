@@ -15,6 +15,7 @@ A real-time **Rubik’s Cube Solver** that uses your webcam to:
 - **HSV-based color classification**  
 - **Kociemba solver** via the `kociemba` Python package  
 - **Arrow overlays** for visual move guidance  
+- **Real-time state tracking** after every move  
 - **Separate viewer window** rendering the cube state via sockets  
 
 ---
